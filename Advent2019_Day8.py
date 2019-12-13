@@ -12,12 +12,7 @@ image_enc = [int(N) for N in image_str]
 AR = [25, 6]
 pix_per_layer = AR[0] * AR[1]
 layer_idx = range(0, len(image_enc), pix_per_layer)
-image = []
-for layer_start in layer_idx:
-    image.append([])
-    for line_start in range(6):
-        slice_start = AR[0]*line_start + layer_start
-        image[layer_start//pix_per_layer].append(image_enc[slice_start:slice_start+AR[0]])
+
 #Part 1
 layers = []
 n_zeros = []
@@ -31,3 +26,13 @@ layer_min_zeros = layers[n_zeros.index(min(n_zeros))]
 checksum = layer_min_zeros.count(1) * layer_min_zeros.count(2)
 
 print(f'Required checksum: {checksum}')
+
+#Part 2
+visible = []
+for pix in range(pix_per_layer):
+    nth_pix = [p[pix] for p in layers]
+    visible.append(next(v for v in nth_pix if v != 2))
+    
+for i in range(AR[1]):
+    vis_layer = visible[i*AR[0]:i*AR[0] + AR[0]]
+    print(''.join([str(pxl) for pxl in vis_layer]).replace('0',' '))
