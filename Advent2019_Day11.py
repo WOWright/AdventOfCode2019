@@ -1,17 +1,13 @@
 # -*- coding: utf-8 -*-
 """
-Created on Fri Dec 13 14:13:30 2019
+Created on Wed Dec 18 15:54:23 2019
 
 @author: CoryJR
 """
 
-with open('Advent2019_Day9_Input.txt', 'r') as f:
+with open('Advent2019_Day11_Input.txt', 'r') as f:
     orig_list = [int(c) for c in f.read().split(',')]
     
-#with open('Example_Day9.txt', 'r') as f:
-#    orig_list = [int(c) for c in f.read().split(',')]
-
-### Part 1
 class Intcode_Computer:
     def __init__(self, data_in):
         
@@ -158,20 +154,6 @@ class Intcode_Computer:
     def basic_grab(self, idx, cmd):
         self.update_program(idx, cmd)
         return cmd[idx]
-            
-with open('Advent2019_Day9_Input.txt', 'r') as f:
-    orig_list = [int(c) for c in f.read().split(',')]
     
+## Part 1    
     
-#with open('Example_Day9.txt', 'r') as f:
-#    orig_list = [int(c) for c in f.read().split(',')]
-
-#Part 1    
-boost = Intcode_Computer(1)
-boost.run_program(orig_list.copy())
-print(boost.output)
-
-#Part 2
-detection = Intcode_Computer(2)
-detection.run_program(orig_list.copy())
-print(detection.output)
