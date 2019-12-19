@@ -50,9 +50,9 @@ class Intcode_Computer:
     def out(self, modes):
         operands = self.read_vals(modes)
         self.output = operands[0]
-        print(f'Output: {self.output}')
+#        print(f'Output: {self.output}')
         if self.feedback:
-            self.thrown_pause = True #for feedback mode only
+            self.paused = True #for feedback mode only
     
     def true_jump(self, modes):
         operands = self.read_vals(modes)
@@ -126,10 +126,7 @@ class Intcode_Computer:
            '2':lambda idx,cmd: self.basic_grab(idx,cmd) + self.rel_base}
         return self.get_operands(fetches, modes, starter)
     
-    def run_program(self, program):
-        self.orig_prog = program.copy()
-        self.run_prog = self.orig_prog.copy()        
-        
+    def run_program(self):               
         while not (self.paused or self.done):
             instruction = self.run_prog[self.cmd_idx]
             modes, cmd = self.mode_check(instruction)
@@ -139,7 +136,10 @@ class Intcode_Computer:
             
         self.paused = False
 
-    
+    def new_program(self, program):
+        self.orig_prog = program.copy()
+        self.run_prog = self.orig_prog.copy() 
+        
     def update_input(self, data_in):
         try:
             iter(data_in)
@@ -155,5 +155,91 @@ class Intcode_Computer:
         self.update_program(idx, cmd)
         return cmd[idx]
     
-## Part 1    
+## Part 1
+robot = Intcode_Computer([0])
+robot.feedback = True
+
+hull = {}
+current_position = [0, 0]
+heading = [1,0]
+robot.new_program(orig_list.copy())
+painted = set()
+left = [1,0]
+while not robot.done:
+#    painted.add(tuple(current_position))
+    robot.run_program()
+    #First output is paint color
+    hull[tuple(current_position)] = robot.output
+    robot.run_program()        
+    if robot.output==0:
+        heading = [heading[1], -heading[0]]
+    else:
+        heading = [-heading[1], heading[0]]
+    current_position = [c+h for c,h in zip(current_position, heading)]
+    if tuple(current_position) in hull.keys():
+        robot.update_input(hull[tuple(current_position)])
+    else:
+        robot.update_input(0)
     
+print(f'Painted panels: {len(hull)}')
+
+##Part 2
+
+#Copy and paste of part 1, with initial input changed
+robot = Intcode_Computer([1])
+robot.feedback = True
+
+hull = {}
+current_position = [0, 0]
+heading = [1,0]
+robot.new_program(orig_list.copy())
+painted = set()
+left = [1,0]
+while not robot.done:
+#    painted.add(tuple(current_position))
+    robot.run_program()
+    #First output is paint color
+    hull[tuple(current_position)] = robot.output
+    robot.run_program()        
+    if robot.output==0:
+        heading = [heading[1], -heading[0]]
+    else:
+        heading = [-heading[1], heading[0]]
+    current_position = [c+h for c,h in zip(current_position, heading)]
+    if tuple(current_position) in hull.keys():
+        robot.update_input(hull[tuple(current_position)])
+    else:
+        robot.update_input(0)
+
+#Actual new stuff        
+import matplotlib.pyplot as plt
+from matplotlib.collections import PatchCollection
+from matplotlib.patches import Rectangle
+
+panels = []
+
+for coord in hull.keys():
+    if hull[coord] == 1:
+        rect = Rectangle((coord[1], coord[0]), 1, 1)
+        panels.append(rect)
+    
+pc = PatchCollection(panels, facecolor='black', edgecolor='None')
+
+fig, ax = plt.subplots()
+ax.add_collection(pc)
+ax.autoscale_view() #because add_collection and add_patch don't do this for reasons
+ax.axis('equal') #Keep the text from being stretched weird
+plt.show()
+
+
+
+
+
+
+
+
+
+
+
+
+
